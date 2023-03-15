@@ -48,10 +48,8 @@ def one_hot(x, n):
     out[x] = 1.0
     return out
 
-# used for testing
 
-
-class ClassicMCTS:
+class ClassicMCTS:  # used for testing
     @staticmethod
     def policy(game):
         representation = game.get_representation()
