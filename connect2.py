@@ -20,7 +20,7 @@ class AlphaZeroModel(nn.Module):
     def forward(self, xs):
         xs = F.relu(self.l1(xs))
         vs = torch.tanh(self.v(xs))
-        pis = F.log_softmax(self.pi(xs), dim=-1)
+        pis = F.softmax(self.pi(xs), dim=-1)
         return vs, pis
 
 # NOTE: the way value and policy are computed could be refactored to make things run
@@ -40,7 +40,7 @@ def alphazero_policy(model, game):
     with torch.no_grad():
         xs = game.get_representation()
         _, pis = model(torch.tensor(xs, dtype=torch.float32))
-        return torch.exp(pis)
+        return pis
 
 
 def one_hot(x, n):
@@ -123,7 +123,7 @@ def main():
 
             # get losses
             vs_loss = F.mse_loss(results, vs.reshape(-1))
-            pis_loss = -(actions * pis).sum(axis=-1).mean()
+            pis_loss = -torch.log((actions * pis).sum(axis=-1)).mean()
             loss = vs_loss + pis_loss
 
             # track losses
